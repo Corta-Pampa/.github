@@ -1,6 +1,6 @@
-## Vos données sécurisées, chez vous.
+### Vos données sécurisées, chez vous.
 
-# Corta déploie des LLM dans votre entreprise. L'IA au quotidien, sans fuite de données.
+# Corta déploie des LLM dans votre entreprise. <br/>L'IA au quotidien, sans fuite de données.
 
 _Une approche structurée, de l’audit à la maintenance._
 
