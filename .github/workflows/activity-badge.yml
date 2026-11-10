@@ -1,0 +1,65 @@
+# "Last activity" badge for the organization profile (profile/README.md).
+#
+# Every 15 minutes, looks up the latest GitHub activity (push, PR, review,
+# comment, issue, release…) of ACTIVITY_USERS across the org's most recently
+# pushed repos, then publishes badge.json + activity.json to the orphan
+# branch "activity" (one commit, force-pushed: main's history stays clean).
+# The README shows it through shields.io:
+#   https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Corta-Pampa/.github/activity/badge.json
+#
+# Private repos: add a repository secret ACTIVITY_TOKEN holding a fine-grained
+# token owned by the organization, read-only on all its repositories.
+# Without it, only public repos are seen. Private repo names are never
+# published or logged.
+
+name: Activity badge
+
+on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/activity-badge.yml
+      - .github/scripts/last-activity.mjs
+
+permissions:
+  contents: write
+
+concurrency:
+  group: activity-badge
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Find the latest activity
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACTIVITY_TOKEN || github.token }}
+          ACTIVITY_ORG: ${{ github.repository_owner }}
+          ACTIVITY_USERS: Zindure,Pauldelacv
+          # Comma-separated repo names to watch only those (default: whole org).
+          ACTIVITY_REPOS: ''
+          ACTIVITY_OUT_DIR: ${{ runner.temp }}/activity
+        run: node .github/scripts/last-activity.mjs
+
+      - name: Publish to the activity branch
+        env:
+          OUT: ${{ runner.temp }}/activity
+        run: |
+          if git fetch --quiet --depth=1 origin activity \
+             && git show FETCH_HEAD:badge.json | cmp --silent - "$OUT/badge.json"; then
+            echo "Badge unchanged, nothing to publish."
+            exit 0
+          fi
+          git switch --quiet --orphan activity
+          cp "$OUT/badge.json" "$OUT/activity.json" .
+          git add badge.json activity.json
+          git -c user.name='github-actions[bot]' \
+              -c user.email='41898282+github-actions[bot]@users.noreply.github.com' \
+              commit --quiet -m 'Update activity badge'
+          git push --quiet --force origin activity
