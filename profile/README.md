@@ -4,6 +4,8 @@
 
 ### Private AI. Built around your business.
 
+![Last activity](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FCorta-Pampa%2F.github%2Factivity%2Fbadge.json)
+
 Corta designs, deploys and maintains private artificial intelligence infrastructure tailored to business needs.
 
 We help companies leverage their data, automate workflows and build new business capabilities without compromising control over their information.
