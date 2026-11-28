@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "namedLogo": "github",
+  "logoColor": "white",
+  "cacheSeconds": 300,
+  "label": "last pull request",
+  "message": "20 hours ago",
+  "color": "green"
+}
